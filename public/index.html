@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Search</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        .rounded-search {
+            border: 1px solid;
+            border-radius: 30px;
+            border-color: #dacece;
+            padding: 0px 10px;
+        }
+
+        .no-border {
+            border: none;
+            width: 95% !important;
+        }
+
+        .no-border:focus {
+            border: none !important;
+            box-shadow: none;
+        }
+
+        .searcg-icon {
+            margin-right: auto;
+        }
+
+        .search-wrapper {
+            margin: 20px 0px;
+        }
+
+        .check-box {
+            margin-top: 8px;
+        }
+
+        p {
+            line-height: 1.57;
+            word-wrap: break-word;
+            color: #3C4043;
+            font-size: 14px;
+            font-family: arial, sans-serif;
+        }
+
+        a {
+            font-size: 20px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-3">
+
+        <div class="form-inline row search-wrapper">
+            <div class="form-group rounded-search col-md-8">
+                <input type="text" id="searchInput" placeholder="Search" class="form-control mx-sm-3 no-border"
+                    aria-describedby="passwordHelpInline">
+                <i class="fa fa-search searcg-icon" id="searchIcon"></i>
+            </div>
+            <div class="col-md-2 check-box">
+                <input type="checkbox" name="AdultOnly" id="IsUserAdult" value="0">
+                <label for="IsUserAdult"> IsUserAdult </label><br>
+            </div>
+
+        </div>
+        <hr />
+        <div id="searchOutput">
+        </div>
+    </div>
+</body>
+<script>
+    $('#searchInput').keypress(function (event) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if (keycode == '13') {
+            findResults();
+        }
+        event.stopPropagation();
+    });
+
+    $('#searchIcon').on('click', function () {
+        findResults();
+    })
+
+    $('#IsUserAdult').on('change', function () {
+        this.value = this.checked ? 1 : 0;
+    })
+    var findResults = function () {
+        const word = $('#searchInput').val().toString();
+        const isAdult = $('#IsUserAdult').val().toString()
+        $.get(`http://localhost:3000/search/?word=${word}&isAdult=${isAdult}`,
+            function (data, status) {
+                let content = '';
+                data.forEach(element => {
+                    content = content + `<div class="row">
+                        <div class="col-md-8">
+
+                            <a href="${element.url}" target="_blank">${element.ContentTitle}</a>
+                            <p>${element.ContentDetails}</p>
+                        </div>
+                    </div>`
+                });
+                $('#searchOutput').children().remove();
+                $('#searchOutput').append(content);
+            });
+    }
+</script>
+
+</html>
